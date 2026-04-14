@@ -1,0 +1,172 @@
+@import "tailwindcss";
+
+:root {
+  --page: #f3f5f8;
+  --page-alt: #eceff4;
+  --surface-0: rgba(255, 255, 255, 0.92);
+  --surface-1: #ffffff;
+  --surface-2: #f8f9fb;
+  --ink: #111318;
+  --muted: #68707d;
+  --signal: #111318;
+  --signal-ink: #ffffff;
+  --accent: #3b68ff;
+  --accent-soft: rgba(59, 104, 255, 0.12);
+  --border-soft: rgba(17, 19, 24, 0.08);
+  --border-strong: rgba(17, 19, 24, 0.14);
+}
+
+@theme inline {
+  --font-sans: var(--font-display);
+  --font-mono: var(--font-mono);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top, rgba(255, 255, 255, 0.9), transparent 30%),
+    linear-gradient(180deg, var(--page) 0%, var(--page-alt) 100%);
+  color: var(--ink);
+  font-family: var(--font-display), sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.font-display {
+  font-family: var(--font-display), sans-serif;
+}
+
+.eyebrow {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.surface-pane {
+  border: 1px solid var(--border-strong);
+  background: var(--surface-0);
+  border-radius: 1.75rem;
+  box-shadow: 0 16px 48px rgba(17, 19, 24, 0.05);
+  backdrop-filter: blur(18px);
+}
+
+.ghost-pane {
+  border: 1px solid var(--border-soft);
+  background: rgba(255, 255, 255, 0.55);
+  border-radius: 1.5rem;
+}
+
+.signal-card {
+  border: 1px solid var(--border-soft);
+  background: var(--surface-1);
+  border-radius: 1.45rem;
+  padding: 1.25rem;
+  box-shadow: 0 12px 30px rgba(17, 19, 24, 0.04);
+}
+
+.signal-card--muted {
+  background: var(--surface-2);
+}
+
+.risk-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border-radius: 999px;
+  padding: 0.42rem 0.78rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.risk-pill--low {
+  background: rgba(23, 178, 106, 0.1);
+  color: #12724a;
+}
+
+.risk-pill--medium {
+  background: rgba(255, 164, 26, 0.14);
+  color: #8f5712;
+}
+
+.risk-pill--high {
+  background: rgba(233, 65, 92, 0.12);
+  color: #9a1c36;
+}
+
+.metric-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.metric-value {
+  margin-top: 0.35rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.action-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 0.78rem 1.1rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition:
+    transform 180ms ease,
+    background-color 180ms ease,
+    color 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.action-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.action-button--primary {
+  background: var(--signal);
+  color: var(--signal-ink);
+}
+
+.action-button--primary:not(:disabled):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 28px rgba(17, 19, 24, 0.12);
+}
+
+.action-button--secondary {
+  border: 1px solid var(--border-strong);
+  background: transparent;
+  color: var(--ink);
+}
+
+.action-button--secondary:not(:disabled):hover {
+  border-color: var(--ink);
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.animate-pulse {
+  animation: pulse-dot 1.4s ease-in-out infinite;
+}
