@@ -66,9 +66,24 @@ export default function Home() {
   }
 
   async function handlePrepareDeposit(vault: AppVault) {
-    if (!wallet.address || !vault.recommendationAmount) return;
+    if (!wallet.address) return;
 
-    const amount = Math.floor(vault.recommendationAmount * 10 ** ASSET_REGISTRY.USDC_BASE.decimals).toString();
+    let depositAmount = vault.recommendationAmount;
+    if (!depositAmount) {
+      const input = window.prompt(
+        `How much USDC do you want to deposit into ${vault.vaultName}?`,
+        "1",
+      );
+      if (!input) return;
+      const parsed = Number(input);
+      if (!Number.isFinite(parsed) || parsed <= 0) {
+        await agent.sendMessage(`That doesn't look like a valid USDC amount: "${input}"`);
+        return;
+      }
+      depositAmount = parsed;
+    }
+
+    const amount = Math.floor(depositAmount * 10 ** ASSET_REGISTRY.USDC_BASE.decimals).toString();
     const response = await fetch("/api/earn/quote", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -99,10 +114,10 @@ export default function Home() {
     vault: AppVault;
   }) {
     const amount = Number(result.quote.fromAmount) / 10 ** ASSET_REGISTRY.USDC_BASE.decimals;
+    const baseScanUrl = `https://basescan.org/tx/${result.hash}`;
     agent.appendAssistantMessage(
-      `Deposit confirmed on Base for ${amount.toFixed(2)} USDC into ${result.vault.protocolName}. Tx hash: ${result.hash}. Refreshing your portfolio now.`,
+      `Deposit confirmed on Base: ${amount.toFixed(2)} USDC → ${result.vault.protocolName} (${result.vault.vaultName}).\n\nView on BaseScan: ${baseScanUrl}\n\nNote: The position may take 5-15 minutes to appear in your portfolio due to LI.FI indexing delay. The deposit itself is already confirmed onchain.`,
     );
-    await agent.refreshPortfolio();
   }
 
   return (

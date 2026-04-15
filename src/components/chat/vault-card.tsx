@@ -19,13 +19,14 @@ export function VaultCard({
   walletConnected: boolean;
   onPrepareDeposit: (vault: AppVault) => Promise<void> | void;
 }) {
-  const disabled = !walletConnected || !vault.executionSupported || !vault.recommendationAmount;
+  const disabled = !walletConnected || !vault.executionSupported;
+  const needsAmount = !vault.recommendationAmount;
   const helperText = !walletConnected
     ? "Connect wallet to prepare a deposit."
     : !vault.executionSupported
       ? "View-only in v1. Real execution is limited to Base USDC."
-      : !vault.recommendationAmount
-        ? "Ask with a specific Base USDC amount to unlock deposit prep."
+      : needsAmount
+        ? "Click to enter an amount, or tell me one in chat."
         : "Approval and deposit will stay separate.";
 
   return (
@@ -70,7 +71,7 @@ export function VaultCard({
           onClick={() => void onPrepareDeposit(vault)}
           className="action-button action-button--secondary"
         >
-          Prepare deposit
+          {needsAmount ? "Set amount & prepare" : "Prepare deposit"}
         </button>
       </div>
     </article>
