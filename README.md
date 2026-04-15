@@ -4,6 +4,12 @@
 
 One chat panel. Connect wallet, ask in plain English, and the agent finds vaults, scores risk, and ships deposits on Base — powered end-to-end by the LI.FI Earn API and Composer.
 
+## Demo
+
+[![Yield.AI demo — click to play](public/demo-poster.png)](public/demo.mp4)
+
+> Click the image to play the full demo (also available at [`public/demo.mp4`](public/demo.mp4)).
+
 ## What makes it AI Native
 
 - **No dashboard.** The chat IS the product. Portfolio, vault discovery, risk analysis, and execution all happen inside one conversation.
