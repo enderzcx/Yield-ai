@@ -1,52 +1,67 @@
 # Yield.AI
 
-Yield.AI is a Next.js App Router MVP for AI-guided yield discovery and deposit execution on LI.FI Earn.
+> AI Native DeFi yield agent built for the [DeFi Mullet Hackathon #1](https://lifi.notion.site/defi-mullet-hackathon-1-builder-edition) — track: **AI x Earn**.
 
-The live transaction path is intentionally narrow:
+One chat panel. Connect wallet, ask in plain English, and the agent finds vaults, scores risk, and ships deposits on Base — powered end-to-end by the LI.FI Earn API and Composer.
 
-- Search and recommendations can reference Ethereum, Base, Arbitrum, and Optimism.
-- Real execution is limited to Base USDC.
-- Approvals and deposits stay as separate wallet signatures.
-- Wallet connection uses injected browser wallets only, such as MetaMask or Rabby.
+## What makes it AI Native
+
+- **No dashboard.** The chat IS the product. Portfolio, vault discovery, risk analysis, and execution all happen inside one conversation.
+- **Wallet-aware welcome.** On connect, the agent auto-calls `get_portfolio` and reacts to what it finds — no clicks required.
+- **Tool-calling LLM.** GPT-4o-mini orchestrates 6 typed tools across the LI.FI surface, with streaming NDJSON back to the UI.
+- **Inline action cards.** Vault cards, position cards, and deposit flows render directly in chat — every recommendation is one click away from a real transaction.
+
+## LI.FI Integration
+
+| Surface | Endpoints used | Tool |
+|---|---|---|
+| **Earn Data API** (`earn.li.fi`) | `/v1/earn/vaults`, `/v1/earn/vaults/:chain/:addr`, `/v1/earn/portfolio/:addr/positions` | `search_vaults`, `get_vault_details`, `get_portfolio` |
+| **Composer** (`li.quest`) | `/v1/quote` (with `toToken = vault address`) | `prepare_deposit` (returns approval info + tx) |
+
+Plus an in-house risk engine (`score_risk`) and a viem-based balance check (`verify_balance`).
 
 ## Stack
 
-- Next.js 16
-- React 19
-- TypeScript
-- Tailwind CSS v4
-- `viem` for wallet and chain interactions
+- Next.js 16 (App Router) + React 19 + TypeScript + Tailwind v4
+- `viem` for EIP-1193 injected wallet, ERC20 reads/writes, Base chain
+- OpenAI-compatible API (any endpoint with tool calling) for the agent loop
+- Direct HTTP to LI.FI APIs, server-side proxy to hide the Composer key
 
-## Environment
+## MVP scope (intentionally narrow)
 
-Copy `.env.example` to `.env.local` and fill in the values you need:
+- ✅ Real deposits on **Base USDC** only
+- ✅ Discovery and read-only positions across Ethereum / Base / Arbitrum / Optimism
+- ✅ Approval and deposit as separate wallet signatures
+- ❌ No withdraw flow
+- ❌ No batch / "Deposit All" — single vault deposits only
 
-```bash
-OPENAI_API_KEY=
-OPENAI_MODEL=gpt-4o-mini
-OPENAI_BASE_URL=https://api.openai.com/v1
-OPENAI_FALLBACK_MODEL=gpt-4.1-mini
-LIFI_API_KEY=
-```
-
-If you are using an OpenAI-compatible endpoint, set `OPENAI_BASE_URL` accordingly. Example:
-
-```bash
-OPENAI_API_KEY=your-key
-OPENAI_BASE_URL=https://enderzcxai.duckdns.org/v1
-OPENAI_MODEL=gpt-4o-mini
-```
-
-There is no `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` anymore because this app no longer uses WalletConnect, RainbowKit, or wagmi.
-
-## Development
+## Setup
 
 ```bash
 npm install
+cp .env.example .env.local   # then fill in your keys
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open [http://localhost:3000](http://localhost:3000) and connect an injected wallet (MetaMask / Rabby / etc.).
+
+### Environment variables
+
+```bash
+OPENAI_API_KEY=            # required
+OPENAI_MODEL=gpt-4o-mini   # any tool-calling model
+OPENAI_BASE_URL=https://api.openai.com/v1  # override for OpenAI-compatible endpoints
+LIFI_API_KEY=              # optional — higher rate limits on Composer (75/2h → 100/min)
+```
+
+## User flow
+
+1. Connect injected wallet → agent reads your LI.FI portfolio and greets accordingly
+2. Ask in natural language: *"I have 100 USDC, find me safe yield"*
+3. Agent calls `verify_balance`, then `search_vaults` with risk scoring
+4. Click `Prepare deposit` on any Base USDC vault card (or set amount on the fly)
+5. Approve USDC spending, then sign the deposit tx
+6. Get a BaseScan link — note that LI.FI portfolio indexing has a 5-15 min delay before the new position appears
 
 ## Verification
 
@@ -56,15 +71,7 @@ npm run lint
 npm run build
 ```
 
-`npm run typecheck` runs `next typegen` before `tsc --noEmit`, which avoids the missing `.next/types` issue on a fresh checkout.
+## Repo
 
-## Current MVP Flow
-
-1. Connect an injected wallet.
-2. Auto-read LI.FI portfolio positions.
-3. Ask for a concrete Base USDC allocation.
-4. Verify onchain balance before enabling deposit preparation.
-5. Review LI.FI Earn vault recommendations.
-6. Approve ERC20 spending if needed.
-7. Send the deposit transaction.
-8. Refresh portfolio positions after confirmation.
+- Live: run `npm run dev` for the local demo
+- GitHub: [enderzcx/Yield-ai](https://github.com/enderzcx/Yield-ai)
